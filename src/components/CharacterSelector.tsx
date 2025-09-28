@@ -30,6 +30,20 @@ export const CharacterSelector: React.FC<CharacterSelectorProps> = ({
     return character.attribute === attributeFilter;
   });
 
+  // 属性名から翻訳キーへのマッピング
+  const getAttributeTranslationKey = (attribute: AttributeType | 'all'): string => {
+    const attributeKeyMap: Record<AttributeType | 'all', string> = {
+      'all': 'all',
+      'アグレッシブ': 'aggressive',
+      'スマート': 'smart',
+      'シャイ': 'shy',
+      'キュート': 'cute',
+      'コミカル': 'comical',
+      'クレバー': 'clever',
+    };
+    return attributeKeyMap[attribute] || 'all';
+  };
+
   // 属性ごとの色設定
   const getAttributeColor = (attribute: string) => {
     const colorMap: Record<string, string> = {
@@ -77,7 +91,7 @@ export const CharacterSelector: React.FC<CharacterSelectorProps> = ({
                 value={attr}
                 className="text-xs px-2 py-1"
               >
-                {attr === 'all' ? t('character.filter.all') : t(`character.filter.${attr.toLowerCase()}`)}
+                {t(`character.filter.${getAttributeTranslationKey(attr)}`)}
               </TabsTrigger>
             ))}
           </TabsList>
