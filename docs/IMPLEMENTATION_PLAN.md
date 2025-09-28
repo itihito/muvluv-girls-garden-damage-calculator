@@ -1111,14 +1111,354 @@ npm install motion framer-motion
 - **API連携**: ゲームデータの動的取得
 - **モバイルアプリ**: React Native での実装
 
-## 6. 確認事項・質問
+## 5.5 仕様確認・最終調整
 
-実装前に以下の点についてご確認をお願いします：
+### 5.5.1 削除項目
 
-1. **キャラクター・スキルデータ**: 具体的なキャラクター名やスキル名、数値設定はありますか？
-2. **ブランディング**: アプリのロゴやアイコンデザインの要望はありますか？
-3. **追加機能**: 上記の基本機能以外に必要な機能はありますか？
-4. **デプロイ環境**: 特定のホスティングサービスの希望はありますか？
-5. **対応ブラウザ**: サポートする最小ブラウザバージョンの指定はありますか？
+#### 5.5.1.1 属性相性選択の削除
+**理由**: 計算結果で「通常ダメージ」と「有利ダメージ」の両方を表示するため不要
 
-この計画書に基づいて開発を進めますが、ご不明な点や変更希望がございましたらお聞かせください。
+**削除対象:**
+```
+❌ 削除項目
+🎯 属性: ●有利 ○通常
+```
+
+**修正後の戦闘設定:**
+```typescript
+// components/SettingsPanel.tsx (最終版)
+const BattleSettings = () => (
+  <Card>
+    <CardHeader>
+      <CardTitle>⚙️ 戦闘設定</CardTitle>
+    </CardHeader>
+    <CardContent className="space-y-4">
+      <SliderInput
+        label="🛡️ 敵防御力"
+        value={enemyDefense}
+        min={0}
+        max={2000}
+        step={10}
+        onChange={setEnemyDefense}
+      />
+
+      <SliderInput
+        label="💎 会心強化"
+        value={criticalBonus}
+        min={0}
+        max={50}
+        step={1}
+        unit="%"
+        onChange={setCriticalBonus}
+      />
+
+      <SliderInput
+        label="🌟 属性強化"
+        value={advantageBonus}
+        min={0}
+        max={50}
+        step={1}
+        unit="%"
+        onChange={setAdvantageBonus}
+      />
+    </CardContent>
+  </Card>
+);
+```
+
+#### 5.5.1.2 エクスポート機能の除外
+**理由**: コア機能に集中し、実装を簡素化
+
+**除外項目:**
+- 計算結果のJSON/CSV出力
+- スクリーンショット保存
+- データ共有機能
+
+### 5.5.2 「📋 詳細設定」機能の定義
+
+#### 5.5.2.1 詳細設定ダイアログの内容
+```typescript
+// types/settings.ts
+interface DetailedSettingsDialog {
+  // 計算過程の表示
+  showCalculationSteps: boolean;
+
+  // 高度な計算設定
+  baseCriticalRate: number;              // 基本会心率 (%) [0-100]
+  roundingMode: 'floor' | 'ceil' | 'round'; // 端数処理方式
+
+  // 表示オプション
+  showFormula: boolean;                  // 計算式表示
+  animateResults: boolean;               // 結果アニメーション
+  detailLevel: 'basic' | 'advanced';     // 詳細レベル
+}
+
+// types/calculation.ts
+interface CalculationSteps {
+  baseAttack: number;                    // 基本攻撃力
+  skillMultiplier: number;               // スキル倍率
+  totalAttack: number;                   // 総攻撃力
+  enemyDefense: number;                  // 敵防御力
+  baseDamage: number;                    // 基礎ダメージ
+  criticalMultiplier: number;            // 会心倍率
+  advantageMultiplier: number;           // 有利倍率
+  finalDamages: {
+    normal: number;
+    critical: number;
+    advantageNormal: number;
+    advantageCritical: number;
+  };
+  formulas: {
+    base: string;                        // "基礎ダメージ = 総攻撃力 - 敵防御力"
+    critical: string;                    // "会心ダメージ = 基礎ダメージ × (1.5 + 会心強化%)"
+    advantage: string;                   // "有利ダメージ = 基礎ダメージ × (1.25 + 属性強化%)"
+    advantageCritical: string;           // "有利会心 = 有利通常 × 会心倍率"
+  };
+}
+```
+
+#### 5.5.2.2 詳細設定ダイアログUI実装
+```typescript
+// components/DetailsDialog.tsx
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Tabs, TabsList, TabsTrigger, TabsContents, TabsContent } from '@/components/ui/tabs';
+
+export const DetailsDialog = ({
+  open,
+  onOpenChange,
+  results,
+  calculationSteps
+}: DetailsDialogProps) => (
+  <Dialog open={open} onOpenChange={onOpenChange}>
+    <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle className="flex items-center gap-2">
+          📋 詳細設定・計算過程
+        </DialogTitle>
+      </DialogHeader>
+
+      <Tabs defaultValue="calculation" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="calculation">計算過程</TabsTrigger>
+          <TabsTrigger value="settings">高度な設定</TabsTrigger>
+        </TabsList>
+
+        <TabsContents>
+          <TabsContent value="calculation" className="mt-4">
+            <CalculationStepsDisplay steps={calculationSteps} />
+          </TabsContent>
+
+          <TabsContent value="settings" className="mt-4">
+            <AdvancedSettingsPanel />
+          </TabsContent>
+        </TabsContents>
+      </Tabs>
+    </DialogContent>
+  </Dialog>
+);
+```
+
+### 5.5.3 最終的な状態管理構造
+
+```typescript
+// stores/calculatorStore.ts (最終版)
+interface CalculatorState {
+  // 選択状態
+  selectedCharacter: Character | null;
+  selectedSkill: Skill | null;
+  skillLevel: number;
+  selectedAttributeFilter: AttributeType | 'all';
+
+  // 手動入力値
+  manualAttackPower: number | null;
+  manualSkillPower: number | null;
+  isManualAttackMode: boolean;
+  isManualSkillMode: boolean;
+
+  // 戦闘設定（属性相性選択を削除）
+  enemyDefense: number;
+  criticalDamageBonus: number;
+  advantageDamageBonus: number;
+
+  // 詳細設定
+  advancedSettings: {
+    baseCriticalRate: number;
+    roundingMode: 'floor' | 'ceil' | 'round';
+    showFormula: boolean;
+    animateResults: boolean;
+  };
+
+  // 計算結果
+  results: DamageResults;
+  calculationSteps: CalculationSteps;
+
+  // アクション（エクスポート機能削除）
+  setCharacter: (character: Character) => void;
+  setSkill: (skill: Skill) => void;
+  setSkillLevel: (level: number) => void;
+  setAttributeFilter: (filter: AttributeType | 'all') => void;
+  setManualAttackPower: (power: number | null) => void;
+  setManualSkillPower: (power: number | null) => void;
+  toggleManualAttackMode: (enabled: boolean) => void;
+  toggleManualSkillMode: (enabled: boolean) => void;
+  updateBattleSettings: (settings: Partial<BattleSettings>) => void;
+  updateAdvancedSettings: (settings: Partial<AdvancedSettings>) => void;
+  calculateDamage: () => void;
+  reset: () => void;
+
+  // ヘルパー
+  getEffectiveAttackPower: () => number;
+  getEffectiveSkillPower: () => number;
+  getBarChartData: () => BarChartData[];
+}
+```
+
+### 5.5.4 実装優先度の調整
+
+**Phase 1 (必須機能):**
+- キャラクター選択（属性フィルター付き）
+- スキル選択（レベル選択+手動入力）
+- 攻撃力設定（手動入力対応）
+- 戦闘設定（敵防御力、会心強化、属性強化）
+- ダメージ計算・棒グラフ表示
+
+**Phase 2 (拡張機能):**
+- 詳細設定ダイアログ
+- 計算過程表示
+- 高度な設定項目
+- アニメーション効果
+
+**Phase 3 (最適化):**
+- パフォーマンス最適化
+- アクセシビリティ改善
+- 多言語対応
+
+## 5.6 デプロイメント・ブラウザ対応要件
+
+### 5.6.1 デプロイメント環境
+
+#### 5.6.1.1 推奨デプロイ先: GitHub Pages
+**選定理由**:
+- 無料で利用可能
+- 静的サイトホスティングに最適
+- GitHubリポジトリとの親和性が高い
+- 設定が簡単で運用負荷が少ない
+
+**デプロイ設定:**
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build
+      run: npm run build
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      if: github.ref == 'refs/heads/main'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./dist
+```
+
+**vite.config.ts設定:**
+```typescript
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  base: '/damage-calc/',  // リポジトリ名に合わせて設定
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets'
+  }
+})
+```
+
+#### 5.6.1.2 代替デプロイ先
+1. **Vercel**: より高機能、プレビュー機能が優秀
+2. **Netlify**: フォーム機能など追加機能が豊富
+3. **Cloudflare Pages**: CDN機能が強力
+
+### 5.6.2 ブラウザ対応要件
+
+#### 5.6.2.1 対象ブラウザ
+**メインターゲット**: Chrome（一般的なバージョン）
+- Chrome 100+ （2022年3月以降のバージョン）
+- 他のモダンブラウザ（Firefox、Safari、Edge）も基本的に動作
+
+#### 5.6.2.2 対応方針
+**シンプル設計**:
+- 最新のWeb標準を使用
+- 複雑なpolyfillは不要
+- TypeScript + Reactの標準機能のみ使用
+
+**必要最小限の互換性確保:**
+```json
+// package.json - browserslist設定
+{
+  "browserslist": [
+    "Chrome >= 100",
+    "Firefox >= 100",
+    "Safari >= 15",
+    "Edge >= 100"
+  ]
+}
+```
+
+**Vite設定:**
+```typescript
+// vite.config.ts
+export default defineConfig({
+  build: {
+    target: 'es2020',  // モダンブラウザ対応
+    minify: 'terser'
+  }
+})
+```
+
+### 5.6.3 ブランディング方針
+
+#### 5.6.3.1 デザイン方針
+**シンプル・ミニマル**:
+- 余計な装飾は排除
+- 機能性重視のUI
+- shadcn/uiのデフォルトテーマを活用
+
+**アプリケーション名**:
+```typescript
+// 簡潔なタイトル
+document.title = "ダメージ計算機"
+
+// meta情報もシンプルに
+<meta name="description" content="ゲームダメージ計算ツール" />
+```
+
+#### 5.6.3.2 追加機能なし
+**開発フォーカス**:
+- コア機能（ダメージ計算）に集中
+- 不要な機能追加は行わない
+- シンプルで直感的な操作性を優先
