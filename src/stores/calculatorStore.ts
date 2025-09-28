@@ -10,9 +10,9 @@ import type {
 
 // デフォルト値定義
 const defaultBattleSettings: BattleSettings = {
-  enemyDefense: 300,
-  criticalDamageBonus: 15, // 15% (基本1.5に+0.15)
-  advantageDamageBonus: 10, // 10% (基本1.25に+0.10)
+  enemyDefense: 0,
+  criticalDamageBonus: 0, // 0% (基本1.5のみ)
+  advantageDamageBonus: 0, // 0% (基本1.25のみ)
 };
 
 const defaultAdvancedSettings: AdvancedSettings = {
@@ -34,9 +34,8 @@ export const useCalculatorStore = create<CalculatorStore>()(
       selectedAttributeFilter: 'all',
 
       manualAttackPower: null,
-      manualSkillPower: null,
+      skillPower: null, // 現在の威力値（スキル選択時に自動設定、手動編集可能）
       isManualAttackMode: false,
-      isManualSkillMode: false,
 
       battleSettings: defaultBattleSettings,
       advancedSettings: defaultAdvancedSettings,
@@ -57,12 +56,22 @@ export const useCalculatorStore = create<CalculatorStore>()(
       },
 
       setSkill: (skill) => {
-        set({ selectedSkill: skill });
+        const newSkillPower = skill ? getSkillPowerAtLevel(skill, get().skillLevel) : null;
+        set({
+          selectedSkill: skill,
+          skillPower: newSkillPower
+        });
         setTimeout(() => get().calculateDamage(), 0);
       },
 
       setSkillLevel: (level) => {
-        set({ skillLevel: Math.max(1, Math.min(15, level)) });
+        const state = get();
+        const newLevel = Math.max(1, Math.min(15, level));
+        const newSkillPower = state.selectedSkill ? getSkillPowerAtLevel(state.selectedSkill, newLevel) : null;
+        set({
+          skillLevel: newLevel,
+          skillPower: newSkillPower
+        });
         setTimeout(() => get().calculateDamage(), 0);
       },
 
@@ -76,8 +85,8 @@ export const useCalculatorStore = create<CalculatorStore>()(
         setTimeout(() => get().calculateDamage(), 0);
       },
 
-      setManualSkillPower: (power) => {
-        set({ manualSkillPower: power });
+      setSkillPower: (power) => {
+        set({ skillPower: power });
         setTimeout(() => get().calculateDamage(), 0);
       },
 
@@ -85,14 +94,6 @@ export const useCalculatorStore = create<CalculatorStore>()(
         set({ isManualAttackMode: enabled });
         if (!enabled) {
           set({ manualAttackPower: null });
-        }
-        setTimeout(() => get().calculateDamage(), 0);
-      },
-
-      toggleManualSkillMode: (enabled) => {
-        set({ isManualSkillMode: enabled });
-        if (!enabled) {
-          set({ manualSkillPower: null });
         }
         setTimeout(() => get().calculateDamage(), 0);
       },
@@ -138,7 +139,8 @@ export const useCalculatorStore = create<CalculatorStore>()(
           selectedSkill,
           skillLevel,
           hitCount,
-          state.advancedSettings
+          state.advancedSettings,
+          state.skillPower
         );
 
         set({ results, calculationSteps: steps });
@@ -151,9 +153,8 @@ export const useCalculatorStore = create<CalculatorStore>()(
           skillLevel: 1,
           selectedAttributeFilter: 'all',
           manualAttackPower: null,
-          manualSkillPower: null,
+          skillPower: null,
           isManualAttackMode: false,
-          isManualSkillMode: false,
           battleSettings: defaultBattleSettings,
           advancedSettings: defaultAdvancedSettings,
           results: null,
@@ -165,7 +166,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
       // === ヘルパー関数 ===
       getEffectiveAttackPower: () => {
         const state = get();
-        const { selectedCharacter, isManualAttackMode, manualAttackPower } = state;
+        const { selectedCharacter, selectedSkill, isManualAttackMode, manualAttackPower } = state;
 
         if (isManualAttackMode && manualAttackPower !== null) {
           return manualAttackPower;
@@ -173,25 +174,17 @@ export const useCalculatorStore = create<CalculatorStore>()(
 
         if (!selectedCharacter) return 0;
 
-        // キャラクターの基礎攻撃力 + スキル威力
+        // 新しい計算式では、総攻撃力はキャラクター攻撃力のみ
         const baseAttack = 1000; // 仮の基礎攻撃力 (後でキャラクターデータから取得)
-        const skillPower = state.getEffectiveSkillPower();
+        const skillPower = state.getCurrentSkillPower();
+        const hitCount = selectedSkill?.hit_count || 1;
 
-        return calculateTotalAttack(baseAttack, skillPower, manualAttackPower);
+        return calculateTotalAttack(baseAttack, skillPower, hitCount, manualAttackPower);
       },
 
-      getEffectiveSkillPower: () => {
+      getCurrentSkillPower: () => {
         const state = get();
-        const { selectedSkill, skillLevel, isManualSkillMode, manualSkillPower } = state;
-
-        if (isManualSkillMode && manualSkillPower !== null) {
-          return manualSkillPower;
-        }
-
-        if (!selectedSkill) return 0;
-
-        // スキルの威力をレベルから取得
-        return getSkillPowerAtLevel(selectedSkill, skillLevel);
+        return state.skillPower || 0;
       },
 
       getBarChartData: () => {

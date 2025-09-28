@@ -1,3 +1,5 @@
+import type { Character, Skill } from '../characterData';
+
 // 既存のCharacter, Skill型を再エクスポート
 export type { Character, Skill } from '../characterData';
 
@@ -39,41 +41,48 @@ export interface DamageResults {
 export interface CalculationSteps {
   step1: {
     label: string;                // "基礎ダメージ計算"
-    formula: string;              // "総攻撃力 - 敵防御力"
+    formula: string;              // "総攻撃力 - 防御力"
     calculation: string;          // "1500 - 300"
     result: number;               // 1200
   };
   step2: {
-    label: string;                // "会心倍率計算"
+    label: string;                // "スキル威力(%)"
+    formula: string;              // "スキル威力 / 100"
+    calculation: string;          // "150.0 / 100"
+    result: number;               // 1.5
+  };
+  step3: {
+    label: string;                // "会心倍率"
     formula: string;              // "1.5 + 会心強化%"
     calculation: string;          // "1.5 + 0.15"
     result: number;               // 1.65
   };
-  step3: {
-    label: string;                // "属性倍率計算"
+  step4: {
+    label: string;                // "属性倍率"
     formula: string;              // "1.25 + 属性強化%"
     calculation: string;          // "1.25 + 0.10"
     result: number;               // 1.35
   };
-  step4: {
+  step5: {
     label: string;                // "最終ダメージ計算"
+    formula: string;              // "(基礎ダメージ × スキル威力(%) × 属性補正 × 会心(%) × ヒット数)"
     formulas: {
-      normal: string;             // "基礎ダメージ"
-      critical: string;           // "基礎ダメージ × 会心倍率"
-      advantageNormal: string;    // "基礎ダメージ × 属性倍率"
-      advantageCritical: string;  // "基礎ダメージ × 会心倍率 × 属性倍率"
+      normal: string;             // "基礎ダメージ × スキル威力(%) × ヒット数"
+      critical: string;           // "基礎ダメージ × スキル威力(%) × 会心倍率 × ヒット数"
+      advantageNormal: string;    // "基礎ダメージ × スキル威力(%) × 属性倍率 × ヒット数"
+      advantageCritical: string;  // "基礎ダメージ × スキル威力(%) × 会心倍率 × 属性倍率 × ヒット数"
     };
     calculations: {
-      normal: string;             // "1200"
-      critical: string;           // "1200 × 1.65"
-      advantageNormal: string;    // "1200 × 1.35"
-      advantageCritical: string;  // "1200 × 1.65 × 1.35"
+      normal: string;             // "1200 × 1.500 × 1"
+      critical: string;           // "1200 × 1.500 × 1.65 × 1"
+      advantageNormal: string;    // "1200 × 1.500 × 1.35 × 1"
+      advantageCritical: string;  // "1200 × 1.500 × 1.65 × 1.35 × 1"
     };
     results: {
-      normal: number;             // 1200
-      critical: number;           // 1980
-      advantageNormal: number;    // 1620
-      advantageCritical: number;  // 2673
+      normal: number;             // 1800
+      critical: number;           // 2970
+      advantageNormal: number;    // 2430
+      advantageCritical: number;  // 4009
     };
   };
 }
@@ -103,9 +112,8 @@ export interface AppState {
 
   // 手動入力値
   manualAttackPower: number | null;
-  manualSkillPower: number | null;
+  skillPower: number | null;  // 現在の威力値（スキル選択時に自動設定、手動編集可能）
   isManualAttackMode: boolean;
-  isManualSkillMode: boolean;
 
   // 戦闘設定
   battleSettings: BattleSettings;
@@ -131,9 +139,8 @@ export interface CalculatorActions {
 
   // 手動入力アクション
   setManualAttackPower: (power: number | null) => void;
-  setManualSkillPower: (power: number | null) => void;
+  setSkillPower: (power: number | null) => void;
   toggleManualAttackMode: (enabled: boolean) => void;
-  toggleManualSkillMode: (enabled: boolean) => void;
 
   // 戦闘設定アクション
   updateBattleSettings: (settings: Partial<BattleSettings>) => void;
@@ -150,7 +157,7 @@ export interface CalculatorActions {
 
   // ヘルパー関数
   getEffectiveAttackPower: () => number;
-  getEffectiveSkillPower: () => number;
+  getCurrentSkillPower: () => number;
   getBarChartData: () => BarChartData[];
 }
 

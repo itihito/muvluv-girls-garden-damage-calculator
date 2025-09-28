@@ -22,9 +22,8 @@ function App() {
 
     // 手動入力状態
     isManualAttackMode,
-    isManualSkillMode,
+    skillPower,
     manualAttackPower,
-    manualSkillPower,
 
     // 設定
     battleSettings,
@@ -41,9 +40,8 @@ function App() {
     setSkillLevel,
     setAttributeFilter,
     toggleManualAttackMode,
-    toggleManualSkillMode,
     setManualAttackPower,
-    setManualSkillPower,
+    setSkillPower,
     updateBattleSettings,
     updateAdvancedSettings,
     setDetailsDialogOpen,
@@ -115,12 +113,10 @@ function App() {
               selectedCharacter={selectedCharacter}
               selectedSkill={selectedSkill}
               skillLevel={skillLevel}
-              isManualSkillMode={isManualSkillMode}
-              manualSkillPower={manualSkillPower}
+              skillPower={skillPower}
               onSelectSkill={setSkill}
               onSkillLevelChange={setSkillLevel}
-              onManualSkillModeToggle={toggleManualSkillMode}
-              onManualSkillPowerChange={setManualSkillPower}
+              onSkillPowerChange={setSkillPower}
             />
 
             <SettingsPanel

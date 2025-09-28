@@ -169,7 +169,12 @@ export const DetailsDialog: React.FC<DetailsDialogProps> = ({
                   3,
                   t('details.calculation.step3')
                 )}
-                {renderFinalDamageStep(calculationSteps.step4)}
+                {renderCalculationStep(
+                  calculationSteps.step4,
+                  4,
+                  t('details.calculation.step4')
+                )}
+                {renderFinalDamageStep(calculationSteps.step5)}
               </div>
             ) : (
               <div className="text-center py-8 text-muted-foreground">

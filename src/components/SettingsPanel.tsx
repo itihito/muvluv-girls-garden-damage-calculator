@@ -52,7 +52,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
             label={t('battle.attackPower')}
             value={manualAttackPower || effectiveAttackPower}
             min={0}
-            max={10000}
+            max={1000000}
             step={1}
             onValueChange={onManualAttackPowerChange}
             unit=""
@@ -64,7 +64,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
             label={t('battle.enemyDefense')}
             value={battleSettings.enemyDefense}
             min={0}
-            max={2000}
+            max={1000000}
             step={10}
             onValueChange={handleEnemyDefenseChange}
             unit=""
@@ -76,8 +76,8 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
             label={t('battle.criticalBonus')}
             value={battleSettings.criticalDamageBonus}
             min={0}
-            max={100}
-            step={1}
+            max={1000}
+            step={0.01}
             onValueChange={handleCriticalBonusChange}
             unit="%"
             className="space-y-2"
@@ -88,8 +88,8 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
             label={t('battle.advantageBonus')}
             value={battleSettings.advantageDamageBonus}
             min={0}
-            max={100}
-            step={1}
+            max={1000}
+            step={0.01}
             onValueChange={handleAdvantageBonusChange}
             unit="%"
             className="space-y-2"
@@ -97,12 +97,17 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
 
           {/* 計算式説明 */}
           <div className="bg-muted/50 rounded-lg p-4 space-y-3">
-            <h4 className="font-medium text-sm">Alterios式ダメージ計算</h4>
+            <h4 className="font-medium text-sm">ダメージ計算</h4>
             <div className="text-xs text-muted-foreground space-y-1">
-              <p>1. 基礎ダメージ = 総攻撃力 - 敵防御力</p>
-              <p>2. 会心倍率 = 1.5 + 会心強化%</p>
-              <p>3. 属性倍率 = 1.25 + 属性強化%</p>
-              <p>4. 最終ダメージ = 基礎ダメージ × 各種倍率</p>
+              <p className="bg-primary/10 p-2 rounded">
+                基礎ダメージ × スキル威力 × 属性倍率 × 会心倍率 × ヒット数
+              </p>
+              <div className="mt-2 space-y-1">
+                <p>1. 基礎ダメージ = 総攻撃力 - 防御力</p>
+                <p>2. スキル威力 = スキルの威力 / 100</p>
+                <p>3. 属性倍率 = 1.25 + ギアによる有利属性ダメージ</p>
+                <p>4. 会心倍率 = 1.5 + ギアによる会心ダメージ</p>
+              </div>
             </div>
           </div>
 

@@ -13,12 +13,10 @@ interface SkillPanelProps {
   selectedCharacter: Character | null;
   selectedSkill: Skill | null;
   skillLevel: number;
-  isManualSkillMode: boolean;
-  manualSkillPower: number | null;
+  skillPower: number | null;
   onSelectSkill: (skill: Skill) => void;
   onSkillLevelChange: (level: number) => void;
-  onManualSkillModeToggle: (enabled: boolean) => void;
-  onManualSkillPowerChange: (power: number | null) => void;
+  onSkillPowerChange: (power: number) => void;
   className?: string;
 }
 
@@ -26,15 +24,18 @@ export const SkillPanel: React.FC<SkillPanelProps> = ({
   selectedCharacter,
   selectedSkill,
   skillLevel,
-  isManualSkillMode,
-  manualSkillPower,
+  skillPower,
   onSelectSkill,
   onSkillLevelChange,
-  onManualSkillModeToggle,
-  onManualSkillPowerChange,
+  onSkillPowerChange,
   className = '',
 }) => {
   const { t } = useTranslation();
+
+  // 現在の威力値を取得（スキル選択時の自動値または手動入力値）
+  const getCurrentSkillPower = () => {
+    return skillPower || 0;
+  };
 
   // スキルタイプごとの色設定
   const getSkillTypeColor = (skillType: string) => {
@@ -46,16 +47,6 @@ export const SkillPanel: React.FC<SkillPanelProps> = ({
     return colorMap[skillType] || 'bg-gray-500 text-white';
   };
 
-  // 現在のスキル威力を取得
-  const getCurrentSkillPower = (): number => {
-    if (isManualSkillMode && manualSkillPower !== null) {
-      return manualSkillPower;
-    }
-    if (selectedSkill) {
-      return getSkillPowerAtLevel(selectedSkill, skillLevel);
-    }
-    return 0;
-  };
 
   if (!selectedCharacter) {
     return (
@@ -137,14 +128,14 @@ export const SkillPanel: React.FC<SkillPanelProps> = ({
                 label={t('skill.level')}
               />
 
-              {/* 手動スキル威力設定 */}
+              {/* スキル威力設定 */}
               <InputButton
-                label={t('skill.manualPower')}
-                value={manualSkillPower || getCurrentSkillPower()}
+                label={t('skill.power')}
+                value={getCurrentSkillPower()}
                 min={0}
-                max={1000}
+                max={10000}
                 step={0.1}
-                onValueChange={onManualSkillPowerChange}
+                onValueChange={onSkillPowerChange}
                 unit=""
                 className="space-y-2"
               />

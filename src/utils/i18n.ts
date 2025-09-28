@@ -7,7 +7,7 @@ const resources = {
     translation: {
       // アプリケーション全般
       app: {
-        title: 'ダメージ計算機',
+        title: 'マブラヴ ガールズガーデン ダメージ計算機',
         description: 'ゲームダメージ計算ツール',
       },
 
@@ -130,7 +130,7 @@ const resources = {
   en: {
     translation: {
       app: {
-        title: 'Damage Calculator',
+        title: 'Muv-Luv girls garden Damage Calculator',
         description: 'Game Damage Calculation Tool',
       },
 
@@ -245,7 +245,7 @@ const resources = {
   zh: {
     translation: {
       app: {
-        title: '伤害计算器',
+        title: 'Muv-Luv girls garden 伤害计算器',
         description: '游戏伤害计算工具',
       },
 
