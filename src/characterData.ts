@@ -1,4 +1,4 @@
-interface Character {
+export interface Character {
   name: string; // 名前
   rarity: "SSR" | "SR" | "R"; // レア
   school: string; // 所属校舎
@@ -12,7 +12,7 @@ interface Character {
   skills: Skill[]; // スキルデータ
 }
 
-interface Skill {
+export interface Skill {
   name: string; // スキル名
   skill_type: "EX" | "AS" | "PS"; // スキルタイプ (EX: EXスキル, AS: アクティブスキル, PS: パッシブスキル)
   power_per_level: (number | undefined)[]; // Lvごとの威力 (Lv1からLv15まで存在し、詳細ページにデータがない場合はundefined)

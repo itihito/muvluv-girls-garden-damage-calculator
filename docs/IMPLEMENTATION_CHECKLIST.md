@@ -31,49 +31,49 @@ src/
 ### 1.1 shadcn/ui コンポーネント追加
 実行コマンド: `npx shadcn@latest add [コンポーネント名]`
 
-- [ ] **tabs** - 属性フィルター用
+- [x] **tabs** - 属性フィルター用
   ```bash
   npx shadcn@latest add tabs
   ```
-- [ ] **card** - レイアウト構造用
+- [x] **card** - レイアウト構造用
   ```bash
   npx shadcn@latest add card
   ```
-- [ ] **input** - 数値入力用
+- [x] **input** - 数値入力用
   ```bash
   npx shadcn@latest add input
   ```
-- [ ] **switch** - 手動入力モード切替用
+- [x] **switch** - 手動入力モード切替用
   ```bash
   npx shadcn@latest add switch
   ```
-- [ ] **dialog** - 詳細設定用
+- [x] **dialog** - 詳細設定用
   ```bash
   npx shadcn@latest add dialog
   ```
-- [ ] **slider** - スライダー入力用
+- [x] **slider** - スライダー入力用
   ```bash
   npx shadcn@latest add slider
   ```
-- [ ] **label** - ラベル表示用
+- [x] **label** - ラベル表示用
   ```bash
   npx shadcn@latest add label
   ```
 
 ### 1.2 npm依存関係追加
-- [ ] **Zustand** - 状態管理
+- [x] **Zustand** - 状態管理
   ```bash
   npm install zustand
   ```
-- [ ] **Recharts** - チャート表示
+- [x] **Recharts** - チャート表示
   ```bash
   npm install recharts
   ```
-- [ ] **react-i18next** - 多言語対応
+- [x] **react-i18next** - 多言語対応
   ```bash
   npm install react-i18next i18next
   ```
-- [ ] **lucide-react** - 追加アイコン（既存確認）
+- [x] **lucide-react** - 追加アイコン（既存確認）
   ```bash
   # 既にインストール済みを確認
   ```
