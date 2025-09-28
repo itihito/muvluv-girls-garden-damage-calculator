@@ -54,9 +54,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
             min={0}
             max={10000}
             step={1}
-            isManualMode={isManualAttackMode}
             onValueChange={onManualAttackPowerChange}
-            onModeToggle={onManualAttackModeToggle}
             unit=""
             className="space-y-2"
           />
@@ -68,9 +66,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
             min={0}
             max={2000}
             step={10}
-            isManualMode={true}
             onValueChange={handleEnemyDefenseChange}
-            onModeToggle={() => {}} // 常に手動入力
             unit=""
             className="space-y-2"
           />
@@ -82,9 +78,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
             min={0}
             max={100}
             step={1}
-            isManualMode={true}
             onValueChange={handleCriticalBonusChange}
-            onModeToggle={() => {}} // 常に手動入力
             unit="%"
             className="space-y-2"
           />
@@ -96,9 +90,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
             min={0}
             max={100}
             step={1}
-            isManualMode={true}
             onValueChange={handleAdvantageBonusChange}
-            onModeToggle={() => {}} // 常に手動入力
             unit="%"
             className="space-y-2"
           />

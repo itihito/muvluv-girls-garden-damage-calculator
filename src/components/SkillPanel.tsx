@@ -135,7 +135,6 @@ export const SkillPanel: React.FC<SkillPanelProps> = ({
                 onChange={onSkillLevelChange}
                 max={15}
                 label={t('skill.level')}
-                size="sm"
               />
 
               {/* 手動スキル威力設定 */}
@@ -145,9 +144,7 @@ export const SkillPanel: React.FC<SkillPanelProps> = ({
                 min={0}
                 max={1000}
                 step={0.1}
-                isManualMode={isManualSkillMode}
                 onValueChange={onManualSkillPowerChange}
-                onModeToggle={onManualSkillModeToggle}
                 unit=""
                 className="space-y-2"
               />

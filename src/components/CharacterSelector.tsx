@@ -155,7 +155,7 @@ export const CharacterSelector: React.FC<CharacterSelectorProps> = ({
                           </div>
 
                           {/* 学校とチーム */}
-                          <div className="text-xs text-muted-foreground space-y-1">
+                          {/* <div className="text-xs text-muted-foreground space-y-1">
                             <div className="flex justify-between">
                               <span>{t('character.school')}:</span>
                               <span>{character.school}</span>
@@ -164,12 +164,12 @@ export const CharacterSelector: React.FC<CharacterSelectorProps> = ({
                               <span>{t('character.team')}:</span>
                               <span className="truncate ml-1">{character.team}</span>
                             </div>
-                          </div>
+                          </div> */}
 
                           {/* スキル数 */}
-                          <div className="text-xs text-muted-foreground">
+                          {/* <div className="text-xs text-muted-foreground">
                             スキル: {character.skills.length}個
-                          </div>
+                          </div> */}
                         </div>
                       </CardContent>
                     </Card>
