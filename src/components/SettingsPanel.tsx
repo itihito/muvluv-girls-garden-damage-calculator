@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
-import { Label } from './ui/label';
 import { InputButton } from './InputButton';
 import { SkillSelectionDialog } from './SkillSelectionDialog';
 import { cn } from '../lib/utils';
@@ -146,48 +144,6 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
             className="space-y-2"
           />
 
-          {/* 計算式説明 */}
-          <div className="bg-muted/50 rounded-lg p-4 space-y-3">
-            <h4 className="font-medium text-sm">ダメージ計算</h4>
-            <div className="text-xs text-muted-foreground space-y-1">
-              <p className="bg-primary/10 p-2 rounded">
-                基礎ダメージ × スキル威力 × 属性倍率 × 会心倍率 × ヒット数
-              </p>
-              <div className="mt-2 space-y-1">
-                <p>1. 基礎ダメージ = 総攻撃力 - 防御力</p>
-                <p>2. スキル威力 = スキルの威力 / 100</p>
-                <p>3. 属性倍率 = 1.25 + ギアによる有利属性ダメージ</p>
-                <p>4. 会心倍率 = 1.5 + ギアによる会心ダメージ</p>
-              </div>
-            </div>
-          </div>
-
-          {/* 現在の設定値表示 */}
-          <div className="bg-primary/5 rounded-lg p-4 space-y-3">
-            <h4 className="font-medium text-sm">現在の戦闘設定</h4>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">総攻撃力:</span>
-                <span className="font-medium">{effectiveAttackPower}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">敵防御力:</span>
-                <span className="font-medium">{battleSettings.enemyDefense}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">会心倍率:</span>
-                <span className="font-medium">
-                  {(1.5 + battleSettings.criticalDamageBonus / 100).toFixed(2)}x
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">属性倍率:</span>
-                <span className="font-medium">
-                  {(1.25 + battleSettings.advantageDamageBonus / 100).toFixed(2)}x
-                </span>
-              </div>
-            </div>
-          </div>
         </CardContent>
       </Card>
 

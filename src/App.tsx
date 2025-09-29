@@ -1,7 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Globe } from 'lucide-react';
-import { Button } from './components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select';
 import { SettingsPanel } from './components/SettingsPanel';
 import { DamageResults } from './components/DamageResults';
@@ -36,7 +35,7 @@ function App() {
     setDetailsDialogOpen,
     getEffectiveAttackPower,
     getBarChartData,
-    reset,
+    // reset,
     init,
   } = useCalculatorStore();
 
@@ -60,9 +59,6 @@ function App() {
               <h1 className="text-2xl font-bold text-primary">
                 {t('app.title')}
               </h1>
-              <p className="text-sm text-muted-foreground">
-                {t('app.description')}
-              </p>
             </div>
             <div className="flex items-center gap-4">
               {/* 言語切替 */}
@@ -80,10 +76,6 @@ function App() {
                 </Select>
               </div>
 
-              {/* リセットボタン */}
-              <Button variant="outline" onClick={reset}>
-                {t('ui.reset')}
-              </Button>
             </div>
           </div>
         </div>
@@ -127,15 +119,6 @@ function App() {
         onAdvancedSettingsChange={updateAdvancedSettings}
       />
 
-      {/* フッター */}
-      <footer className="border-t mt-12">
-        <div className="container mx-auto px-4 py-6">
-          <div className="text-center text-sm text-muted-foreground">
-            <p>© 2024 Damage Calculator - Alterios Formula Implementation</p>
-            <p className="mt-1">React + TypeScript + Vite + shadcn/ui</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
