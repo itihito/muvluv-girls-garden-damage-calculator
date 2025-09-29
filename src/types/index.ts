@@ -113,6 +113,7 @@ export interface AppState {
   // 手動入力値
   manualAttackPower: number | null;
   skillPower: number | null;  // 現在の威力値（スキル選択時に自動設定、手動編集可能）
+  hitCount: number | null;    // ヒット数（スキル選択時に自動設定、手動編集可能）
   isManualAttackMode: boolean;
 
   // 戦闘設定
@@ -140,6 +141,7 @@ export interface CalculatorActions {
   // 手動入力アクション
   setManualAttackPower: (power: number | null) => void;
   setSkillPower: (power: number | null) => void;
+  setHitCount: (count: number | null) => void;
   toggleManualAttackMode: (enabled: boolean) => void;
 
   // 戦闘設定アクション
@@ -159,6 +161,9 @@ export interface CalculatorActions {
   getEffectiveAttackPower: () => number;
   getCurrentSkillPower: () => number;
   getBarChartData: () => BarChartData[];
+
+  // 初期化
+  init: () => void;
 }
 
 // Zustand ストア型 (AppState + Actions)

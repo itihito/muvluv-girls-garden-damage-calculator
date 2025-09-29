@@ -1,9 +1,8 @@
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Globe } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select';
-import { CharacterSelector } from './components/CharacterSelector';
-import { SkillPanel } from './components/SkillPanel';
 import { SettingsPanel } from './components/SettingsPanel';
 import { DamageResults } from './components/DamageResults';
 import { DetailsDialog } from './components/DetailsDialog';
@@ -14,15 +13,9 @@ function App() {
   const { t, i18n } = useTranslation();
 
   const {
-    // 選択状態
-    selectedCharacter,
-    selectedSkill,
-    skillLevel,
-    selectedAttributeFilter,
-
     // 手動入力状態
-    isManualAttackMode,
     skillPower,
+    hitCount,
     manualAttackPower,
 
     // 設定
@@ -35,20 +28,22 @@ function App() {
     isDetailsDialogOpen,
 
     // アクション
-    setCharacter,
-    setSkill,
-    setSkillLevel,
-    setAttributeFilter,
-    toggleManualAttackMode,
     setManualAttackPower,
     setSkillPower,
+    setHitCount,
     updateBattleSettings,
     updateAdvancedSettings,
     setDetailsDialogOpen,
     getEffectiveAttackPower,
     getBarChartData,
     reset,
+    init,
   } = useCalculatorStore();
+
+  // 初期化実行
+  React.useEffect(() => {
+    init();
+  }, [init]);
 
   // 言語変更ハンドラー
   const handleLanguageChange = (lang: string) => {
@@ -96,37 +91,19 @@ function App() {
 
       {/* メインコンテンツ */}
       <main className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* 左カラム: キャラクター選択 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* 左カラム: 戦闘設定 */}
           <div className="lg:col-span-1">
-            <CharacterSelector
-              selectedCharacter={selectedCharacter}
-              onSelectCharacter={setCharacter}
-              attributeFilter={selectedAttributeFilter}
-              onAttributeFilterChange={setAttributeFilter}
-            />
-          </div>
-
-          {/* 中央カラム: スキル設定・戦闘設定 */}
-          <div className="lg:col-span-1 space-y-6">
-            <SkillPanel
-              selectedCharacter={selectedCharacter}
-              selectedSkill={selectedSkill}
-              skillLevel={skillLevel}
-              skillPower={skillPower}
-              onSelectSkill={setSkill}
-              onSkillLevelChange={setSkillLevel}
-              onSkillPowerChange={setSkillPower}
-            />
-
             <SettingsPanel
               battleSettings={battleSettings}
               onBattleSettingsChange={updateBattleSettings}
-              isManualAttackMode={isManualAttackMode}
               manualAttackPower={manualAttackPower}
               effectiveAttackPower={getEffectiveAttackPower()}
-              onManualAttackModeToggle={toggleManualAttackMode}
+              skillPower={skillPower}
+              hitCount={hitCount}
               onManualAttackPowerChange={setManualAttackPower}
+              onSkillPowerChange={setSkillPower}
+              onHitCountChange={setHitCount}
             />
           </div>
 

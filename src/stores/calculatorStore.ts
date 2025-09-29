@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { calculateDamage, getSkillPowerAtLevel, calculateTotalAttack } from '../utils/damageCalculator';
+import { calculateDamage, getSkillPowerAtLevel } from '../utils/damageCalculator';
 import type {
   CalculatorStore,
   BattleSettings,
@@ -35,6 +35,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 
       manualAttackPower: null,
       skillPower: null, // 現在の威力値（スキル選択時に自動設定、手動編集可能）
+      hitCount: null,   // ヒット数（スキル選択時に自動設定、手動編集可能）
       isManualAttackMode: false,
 
       battleSettings: defaultBattleSettings,
@@ -57,9 +58,11 @@ export const useCalculatorStore = create<CalculatorStore>()(
 
       setSkill: (skill) => {
         const newSkillPower = skill ? getSkillPowerAtLevel(skill, get().skillLevel) : null;
+        const newHitCount = skill?.hit_count || null;
         set({
           selectedSkill: skill,
-          skillPower: newSkillPower
+          skillPower: newSkillPower,
+          hitCount: newHitCount
         });
         setTimeout(() => get().calculateDamage(), 0);
       },
@@ -87,6 +90,11 @@ export const useCalculatorStore = create<CalculatorStore>()(
 
       setSkillPower: (power) => {
         set({ skillPower: power });
+        setTimeout(() => get().calculateDamage(), 0);
+      },
+
+      setHitCount: (count) => {
+        set({ hitCount: count });
         setTimeout(() => get().calculateDamage(), 0);
       },
 
@@ -121,26 +129,24 @@ export const useCalculatorStore = create<CalculatorStore>()(
       // === 計算アクション ===
       calculateDamage: () => {
         const state = get();
-        const { selectedCharacter, selectedSkill, skillLevel } = state;
+        const { skillPower, hitCount } = state;
 
-        if (!selectedCharacter || !selectedSkill) {
-          set({ results: null, calculationSteps: null });
-          return;
-        }
+        // スキル威力とヒット数のデフォルト値を設定
+        const effectiveSkillPower = skillPower || 100;
+        const effectiveHitCount = hitCount || 1;
 
         // 攻撃力計算
         const totalAttack = state.getEffectiveAttackPower();
-        const hitCount = selectedSkill.hit_count || 1;
 
         // ダメージ計算実行
         const { results, steps } = calculateDamage(
           totalAttack,
           state.battleSettings,
-          selectedSkill,
-          skillLevel,
-          hitCount,
+          null, // スキルオブジェクトは不要
+          1,    // スキルレベルは不要
+          effectiveHitCount,
           state.advancedSettings,
-          state.skillPower
+          effectiveSkillPower
         );
 
         set({ results, calculationSteps: steps });
@@ -154,6 +160,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
           selectedAttributeFilter: 'all',
           manualAttackPower: null,
           skillPower: null,
+          hitCount: null,
           isManualAttackMode: false,
           battleSettings: defaultBattleSettings,
           advancedSettings: defaultAdvancedSettings,
@@ -166,20 +173,10 @@ export const useCalculatorStore = create<CalculatorStore>()(
       // === ヘルパー関数 ===
       getEffectiveAttackPower: () => {
         const state = get();
-        const { selectedCharacter, selectedSkill, isManualAttackMode, manualAttackPower } = state;
+        const { manualAttackPower } = state;
 
-        if (isManualAttackMode && manualAttackPower !== null) {
-          return manualAttackPower;
-        }
-
-        if (!selectedCharacter) return 0;
-
-        // 新しい計算式では、総攻撃力はキャラクター攻撃力のみ
-        const baseAttack = 1000; // 仮の基礎攻撃力 (後でキャラクターデータから取得)
-        const skillPower = state.getCurrentSkillPower();
-        const hitCount = selectedSkill?.hit_count || 1;
-
-        return calculateTotalAttack(baseAttack, skillPower, hitCount, manualAttackPower);
+        // 手動入力がある場合はそれを使用、なければデフォルト値
+        return manualAttackPower !== null ? manualAttackPower : 1000;
       },
 
       getCurrentSkillPower: () => {
@@ -217,6 +214,11 @@ export const useCalculatorStore = create<CalculatorStore>()(
         ];
 
         return barChartData;
+      },
+
+      // 初期化時に一度計算を実行
+      init: () => {
+        setTimeout(() => get().calculateDamage(), 0);
       },
     }),
     {

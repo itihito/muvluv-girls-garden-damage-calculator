@@ -1,32 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Button } from './ui/button';
+import { Label } from './ui/label';
 import { InputButton } from './InputButton';
+import { SkillSelectionDialog } from './SkillSelectionDialog';
 import { cn } from '../lib/utils';
 import type { BattleSettings } from '../types';
 
 interface SettingsPanelProps {
   battleSettings: BattleSettings;
   onBattleSettingsChange: (settings: Partial<BattleSettings>) => void;
-  isManualAttackMode: boolean;
   manualAttackPower: number | null;
   effectiveAttackPower: number;
-  onManualAttackModeToggle: (enabled: boolean) => void;
+  skillPower: number | null;
+  hitCount: number | null;
   onManualAttackPowerChange: (power: number | null) => void;
+  onSkillPowerChange: (power: number) => void;
+  onHitCountChange: (count: number) => void;
   className?: string;
 }
 
 export const SettingsPanel: React.FC<SettingsPanelProps> = ({
   battleSettings,
   onBattleSettingsChange,
-  isManualAttackMode,
   manualAttackPower,
   effectiveAttackPower,
-  onManualAttackModeToggle,
+  skillPower,
+  hitCount,
   onManualAttackPowerChange,
+  onSkillPowerChange,
+  onHitCountChange,
   className = '',
 }) => {
   const { t } = useTranslation();
+  const [isSkillDialogOpen, setIsSkillDialogOpen] = useState(false);
 
   const handleEnemyDefenseChange = (value: number) => {
     onBattleSettingsChange({ enemyDefense: value });
@@ -38,6 +46,12 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
 
   const handleAdvantageBonusChange = (value: number) => {
     onBattleSettingsChange({ advantageDamageBonus: value });
+  };
+
+  const handleSkillPowerSelect = (power: number, hitCount: number) => {
+    onSkillPowerChange(power);
+    onHitCountChange(hitCount);
+    setIsSkillDialogOpen(false);
   };
 
   return (
@@ -67,6 +81,43 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
             max={1000000}
             step={10}
             onValueChange={handleEnemyDefenseChange}
+            unit=""
+            className="space-y-2"
+          />
+
+          {/* スキル威力設定 */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium">スキル威力</Label>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsSkillDialogOpen(true)}
+                className="text-xs"
+              >
+                キャラクタースキルから入力
+              </Button>
+            </div>
+            <InputButton
+              label=""
+              value={skillPower || 100}
+              min={0}
+              max={10000}
+              step={0.1}
+              onValueChange={onSkillPowerChange}
+              unit=""
+              className=""
+            />
+          </div>
+
+          {/* ヒット数設定 */}
+          <InputButton
+            label="ヒット数"
+            value={hitCount || 1}
+            min={1}
+            max={20}
+            step={1}
+            onValueChange={onHitCountChange}
             unit=""
             className="space-y-2"
           />
@@ -139,6 +190,13 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
           </div>
         </CardContent>
       </Card>
+
+      {/* スキル選択ダイアログ */}
+      <SkillSelectionDialog
+        isOpen={isSkillDialogOpen}
+        onClose={() => setIsSkillDialogOpen(false)}
+        onSkillPowerSelect={handleSkillPowerSelect}
+      />
     </div>
   );
 };

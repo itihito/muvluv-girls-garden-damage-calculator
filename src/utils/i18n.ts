@@ -74,7 +74,7 @@ const resources = {
         totalAttack: '総攻撃力',
         baseDamage: '基礎ダメージ',
         details: '詳細設定',
-        noResults: '結果を表示するにはキャラクターとスキルを選択してください',
+        noResults: '戦闘設定を入力してダメージを計算中です',
       },
 
       // 詳細設定ダイアログ
@@ -192,7 +192,7 @@ const resources = {
         totalAttack: 'Total Attack',
         baseDamage: 'Base Damage',
         details: 'Details',
-        noResults: 'Select character and skill to view results',
+        noResults: 'Enter battle settings to calculate damage',
       },
 
       details: {
@@ -307,7 +307,7 @@ const resources = {
         totalAttack: '总攻击力',
         baseDamage: '基础伤害',
         details: '详细信息',
-        noResults: '请选择角色和技能以查看结果',
+        noResults: '输入战斗设置以计算伤害',
       },
 
       details: {
