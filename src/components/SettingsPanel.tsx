@@ -87,7 +87,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
 
           {/* スキル威力設定 */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
+            {/* <div className="flex items-center justify-between">
               <Label className="text-sm font-medium">スキル威力</Label>
               <Button
                 variant="outline"
@@ -97,9 +97,9 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
               >
                 キャラクタースキルから入力
               </Button>
-            </div>
+            </div> */}
             <InputButton
-              label=""
+              label="スキル威力"
               value={skillPower || 100}
               min={0}
               max={10000}

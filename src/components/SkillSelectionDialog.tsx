@@ -138,7 +138,7 @@ export const SkillSelectionDialog: React.FC<SkillSelectionDialogProps> = ({
                       <div>
                         <h4 className="font-medium text-sm truncate">{character.name}</h4>
                         <Badge variant="secondary" className="text-xs">
-                          {t(`character.attribute.${getAttributeTranslationKey(character.attribute as AttributeType)}`)}
+                          {t(`character.filter.${getAttributeTranslationKey(character.attribute as AttributeType)}`)}
                         </Badge>
                       </div>
                     </div>
