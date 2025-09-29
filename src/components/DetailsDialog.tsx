@@ -40,7 +40,7 @@ export const DetailsDialog: React.FC<DetailsDialogProps> = ({
 
   // 計算ステップのレンダリング
   const renderCalculationStep = (
-    step: any,
+    step: { label: string; formula: string; calculation: string; result: number },
     stepNumber: number,
     title: string
   ) => (
@@ -75,7 +75,13 @@ export const DetailsDialog: React.FC<DetailsDialogProps> = ({
   );
 
   // 最終ダメージ計算ステップのレンダリング
-  const renderFinalDamageStep = (step: any) => (
+  const renderFinalDamageStep = (step: {
+    label: string;
+    formula: string;
+    formulas: Record<string, string>;
+    calculations: Record<string, string>;
+    results: Record<string, number>;
+  }) => (
     <Card className="mb-4">
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">

@@ -143,12 +143,9 @@ export function getSkillPowerAtLevel(skill: Skill, level: number): number {
 /**
  * 総攻撃力計算
  * 新しい計算式では、総攻撃力 = キャラクター攻撃力のみ
- * スキル威力とヒット回数は後の計算で使用
  */
 export function calculateTotalAttack(
   baseAttack: number,
-  _skillPower: number,
-  _hitCount: number = 1,
   manualAttackPower?: number | null
 ): number {
   // 手動入力が有効な場合はそれを使用
@@ -158,18 +155,6 @@ export function calculateTotalAttack(
 
   // 新しい計算式では、総攻撃力はキャラクター攻撃力のみ
   return baseAttack;
-}
-
-/**
- * 属性相性チェック (将来の拡張用)
- */
-export function checkAttributeAdvantage(
-  _attackerAttribute: string,
-  _defenderAttribute: string
-): boolean {
-  // 現在は常にfalseを返す (手動で設定するため)
-  // 将来的には属性相性表を実装可能
-  return false;
 }
 
 /**
@@ -317,9 +302,8 @@ export function findOptimalSkillLevel(
   let optimalLevel = 1;
 
   for (let level = 1; level <= 15; level++) {
-    const skillPower = getSkillPowerAtLevel(skill, level);
     const hitCount = skill.hit_count || 1;
-    const totalAttack = calculateTotalAttack(baseAttack, skillPower, hitCount);
+    const totalAttack = calculateTotalAttack(baseAttack);
 
     const { results } = calculateDamage(
       totalAttack,
