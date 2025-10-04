@@ -98,8 +98,6 @@ export interface BarChartData {
 export interface AdvancedSettings {
   baseCriticalRate: number;       // 基本会心率 (%)
   roundingMode: 'floor' | 'ceil' | 'round'; // 端数処理方法
-  showFormula: boolean;           // 計算式表示
-  animateResults: boolean;        // 結果アニメーション
 }
 
 // アプリケーション全体の状態型
@@ -160,7 +158,7 @@ export interface CalculatorActions {
   // ヘルパー関数
   getEffectiveAttackPower: () => number;
   getCurrentSkillPower: () => number;
-  getBarChartData: () => BarChartData[];
+  getBarChartData: (labels?: { normal: string; critical: string; advantage: string; advantageCritical: string }) => BarChartData[];
 
   // 初期化
   init: () => void;

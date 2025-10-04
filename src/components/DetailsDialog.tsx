@@ -8,8 +8,6 @@ import {
 } from './ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Switch } from './ui/switch';
-import { Label } from './ui/label';
 import { Badge } from './ui/badge';
 import { cn } from '../lib/utils';
 import type { CalculationSteps, AdvancedSettings } from '../types';
@@ -32,6 +30,19 @@ export const DetailsDialog: React.FC<DetailsDialogProps> = ({
   className = '',
 }) => {
   const { t } = useTranslation();
+
+  // 計算式の翻訳ヘルパー関数
+  const translateFormula = (formula: string): string => {
+    return formula
+      .replace('総攻撃力 - 防御力', t('details.calculation.formulas.baseDamageFormula'))
+      .replace('スキル威力 / 100', t('details.calculation.formulas.skillPowerFormula'))
+      .replace('1.5 + 会心強化%', t('details.calculation.formulas.criticalBonusFormula'))
+      .replace('1.25 + 属性強化%', t('details.calculation.formulas.advantageBonusFormula'))
+      .replace('基礎ダメージ × スキル威力(%) × ヒット数', t('details.calculation.formulas.normalFormula'))
+      .replace('基礎ダメージ × スキル威力(%) × 会心倍率 × ヒット数', t('details.calculation.formulas.criticalFormula'))
+      .replace('基礎ダメージ × スキル威力(%) × 属性倍率 × ヒット数', t('details.calculation.formulas.advantageNormalFormula'))
+      .replace('基礎ダメージ × スキル威力(%) × 会心倍率 × 属性倍率 × ヒット数', t('details.calculation.formulas.advantageCriticalFormula'));
+  };
 
   // 数値フォーマット
   const formatNumber = (value: number): string => {
@@ -57,7 +68,7 @@ export const DetailsDialog: React.FC<DetailsDialogProps> = ({
         <div className="grid gap-2">
           <div className="flex justify-between items-center">
             <span className="text-sm text-muted-foreground">{t('details.calculation.formula')}:</span>
-            <code className="text-sm bg-muted px-2 py-1 rounded">{step.formula}</code>
+            <code className="text-sm bg-muted px-2 py-1 rounded">{translateFormula(step.formula)}</code>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-sm text-muted-foreground">{t('details.calculation.calculation')}:</span>
@@ -99,8 +110,8 @@ export const DetailsDialog: React.FC<DetailsDialogProps> = ({
             <span className="font-bold text-blue-600">{formatNumber(step.results.normal)}</span>
           </div>
           <div className="text-xs text-blue-600 space-y-1">
-            <div>公式: {step.formulas.normal}</div>
-            <div>計算: {step.calculations.normal}</div>
+            <div>{t('details.calculation.formulaLabel')}: {translateFormula(step.formulas.normal)}</div>
+            <div>{t('details.calculation.calculationLabel')}: {step.calculations.normal}</div>
           </div>
         </div>
 
@@ -111,8 +122,8 @@ export const DetailsDialog: React.FC<DetailsDialogProps> = ({
             <span className="font-bold text-orange-600">{formatNumber(step.results.critical)}</span>
           </div>
           <div className="text-xs text-orange-600 space-y-1">
-            <div>公式: {step.formulas.critical}</div>
-            <div>計算: {step.calculations.critical}</div>
+            <div>{t('details.calculation.formulaLabel')}: {translateFormula(step.formulas.critical)}</div>
+            <div>{t('details.calculation.calculationLabel')}: {step.calculations.critical}</div>
           </div>
         </div>
 
@@ -123,8 +134,8 @@ export const DetailsDialog: React.FC<DetailsDialogProps> = ({
             <span className="font-bold text-green-600">{formatNumber(step.results.advantageNormal)}</span>
           </div>
           <div className="text-xs text-green-600 space-y-1">
-            <div>公式: {step.formulas.advantageNormal}</div>
-            <div>計算: {step.calculations.advantageNormal}</div>
+            <div>{t('details.calculation.formulaLabel')}: {translateFormula(step.formulas.advantageNormal)}</div>
+            <div>{t('details.calculation.calculationLabel')}: {step.calculations.advantageNormal}</div>
           </div>
         </div>
 
@@ -135,8 +146,8 @@ export const DetailsDialog: React.FC<DetailsDialogProps> = ({
             <span className="font-bold text-red-600">{formatNumber(step.results.advantageCritical)}</span>
           </div>
           <div className="text-xs text-red-600 space-y-1">
-            <div>公式: {step.formulas.advantageCritical}</div>
-            <div>計算: {step.calculations.advantageCritical}</div>
+            <div>{t('details.calculation.formulaLabel')}: {translateFormula(step.formulas.advantageCritical)}</div>
+            <div>{t('details.calculation.calculationLabel')}: {step.calculations.advantageCritical}</div>
           </div>
         </div>
       </CardContent>
@@ -222,37 +233,6 @@ export const DetailsDialog: React.FC<DetailsDialogProps> = ({
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">表示設定</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="show-formula" className="text-sm font-medium">
-                    {t('details.advanced.showFormula')}
-                  </Label>
-                  <Switch
-                    id="show-formula"
-                    checked={advancedSettings.showFormula}
-                    onCheckedChange={(checked) =>
-                      onAdvancedSettingsChange({ showFormula: checked })
-                    }
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="animate-results" className="text-sm font-medium">
-                    {t('details.advanced.animateResults')}
-                  </Label>
-                  <Switch
-                    id="animate-results"
-                    checked={advancedSettings.animateResults}
-                    onCheckedChange={(checked) =>
-                      onAdvancedSettingsChange({ animateResults: checked })
-                    }
-                  />
-                </div>
-              </CardContent>
-            </Card>
           </TabsContent>
         </Tabs>
       </DialogContent>
