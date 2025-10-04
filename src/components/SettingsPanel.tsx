@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { InputButton } from './InputButton';
 import { SkillSelectionDialog } from './SkillSelectionDialog';
+import { GAME_CONSTANTS } from '../constants/gameConstants';
 import { cn } from '../lib/utils';
 import type { BattleSettings } from '../types';
 
@@ -63,8 +64,8 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = React.memo(({
           <InputButton
             label={t('battle.attackPower')}
             value={manualAttackPower || effectiveAttackPower}
-            min={0}
-            max={1000000}
+            min={GAME_CONSTANTS.ATTACK_POWER.MIN}
+            max={GAME_CONSTANTS.ATTACK_POWER.MAX}
             step={1}
             onValueChange={onManualAttackPowerChange}
             unit=""
@@ -75,9 +76,9 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = React.memo(({
           <InputButton
             label={t('battle.enemyDefense')}
             value={battleSettings.enemyDefense}
-            min={0}
-            max={1000000}
-            step={10}
+            min={GAME_CONSTANTS.DEFENSE.MIN}
+            max={GAME_CONSTANTS.DEFENSE.MAX}
+            step={GAME_CONSTANTS.DEFENSE.STEP}
             onValueChange={handleEnemyDefenseChange}
             unit=""
             className="space-y-2"
@@ -98,9 +99,9 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = React.memo(({
             </div> */}
             <InputButton
               label={t('battle.skillPower')}
-              value={skillPower || 100}
-              min={0}
-              max={10000}
+              value={skillPower || GAME_CONSTANTS.SKILL_POWER.DEFAULT}
+              min={GAME_CONSTANTS.SKILL_POWER.MIN}
+              max={GAME_CONSTANTS.SKILL_POWER.MAX}
               step={0.1}
               onValueChange={onSkillPowerChange}
               unit=""
@@ -111,9 +112,9 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = React.memo(({
           {/* ヒット数設定 */}
           <InputButton
             label={t('battle.hitCount')}
-            value={hitCount || 1}
-            min={1}
-            max={20}
+            value={hitCount || GAME_CONSTANTS.HIT_COUNT.DEFAULT}
+            min={GAME_CONSTANTS.HIT_COUNT.MIN}
+            max={GAME_CONSTANTS.HIT_COUNT.MAX}
             step={1}
             onValueChange={onHitCountChange}
             unit=""
@@ -125,8 +126,8 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = React.memo(({
             label={t('battle.criticalBonus')}
             value={battleSettings.criticalDamageBonus}
             min={0}
-            max={1000}
-            step={0.01}
+            max={GAME_CONSTANTS.BONUS.CRITICAL_MAX}
+            step={GAME_CONSTANTS.BONUS.STEP}
             onValueChange={handleCriticalBonusChange}
             unit="%"
             className="space-y-2"
@@ -137,8 +138,8 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = React.memo(({
             label={t('battle.advantageBonus')}
             value={battleSettings.advantageDamageBonus}
             min={0}
-            max={1000}
-            step={0.01}
+            max={GAME_CONSTANTS.BONUS.ADVANTAGE_MAX}
+            step={GAME_CONSTANTS.BONUS.STEP}
             onValueChange={handleAdvantageBonusChange}
             unit="%"
             className="space-y-2"

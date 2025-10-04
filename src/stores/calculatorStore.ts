@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { debounce } from 'lodash-es';
 import { calculateDamage, getSkillPowerAtLevel } from '../utils/damageCalculator';
+import { GAME_CONSTANTS, ROUNDING_MODES } from '../constants/gameConstants';
 import type {
   CalculatorStore,
   BattleSettings,
@@ -18,7 +19,7 @@ const defaultBattleSettings: BattleSettings = {
 
 const defaultAdvancedSettings: AdvancedSettings = {
   baseCriticalRate: 5, // 5%
-  roundingMode: 'floor',
+  roundingMode: ROUNDING_MODES.FLOOR,
 };
 
 // Zustand ストア作成
@@ -74,7 +75,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 
         setSkillLevel: (level) => {
           const state = get();
-          const newLevel = Math.max(1, Math.min(15, level));
+          const newLevel = Math.max(GAME_CONSTANTS.SKILL_LEVEL.MIN, Math.min(GAME_CONSTANTS.SKILL_LEVEL.MAX, level));
           const newSkillPower = state.selectedSkill ? getSkillPowerAtLevel(state.selectedSkill, newLevel) : null;
           set({
             skillLevel: newLevel,
@@ -138,8 +139,8 @@ export const useCalculatorStore = create<CalculatorStore>()(
           const { skillPower, hitCount } = state;
 
           // スキル威力とヒット数のデフォルト値を設定
-          const effectiveSkillPower = skillPower || 100;
-          const effectiveHitCount = hitCount || 1;
+          const effectiveSkillPower = skillPower || GAME_CONSTANTS.SKILL_POWER.DEFAULT;
+          const effectiveHitCount = hitCount || GAME_CONSTANTS.HIT_COUNT.DEFAULT;
 
           // 攻撃力計算
           const totalAttack = state.getEffectiveAttackPower();
@@ -182,7 +183,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
           const { manualAttackPower } = state;
 
           // 手動入力がある場合はそれを使用、なければデフォルト値
-          return manualAttackPower !== null ? manualAttackPower : 1000;
+          return manualAttackPower !== null ? manualAttackPower : GAME_CONSTANTS.ATTACK_POWER.DEFAULT;
         },
 
         getCurrentSkillPower: () => {

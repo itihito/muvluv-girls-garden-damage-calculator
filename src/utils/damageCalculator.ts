@@ -1,4 +1,5 @@
 import { logger } from "./logger";
+import { GAME_CONSTANTS } from '../constants/gameConstants';
 import type {
   DamageResults,
   CalculationSteps,
@@ -58,11 +59,11 @@ export function calculateDamage(
     skillPowerFromLevel = manualSkillPower;
     logger.debug('✋ 手動スキル威力使用:', manualSkillPower);
   } else {
-    skillPowerFromLevel = skill ? getSkillPowerAtLevel(skill, skillLevel) : 100;
+    skillPowerFromLevel = skill ? getSkillPowerAtLevel(skill, skillLevel) : GAME_CONSTANTS.SKILL_POWER.DEFAULT;
     logger.debug('📊 レベルからスキル威力取得:', skillPowerFromLevel);
   }
 
-  const skillPowerPercent = skillPowerFromLevel / 100;
+  const skillPowerPercent = skillPowerFromLevel / GAME_CONSTANTS.SKILL_POWER.PERCENT_DIVISOR;
   logger.debug('⚡ スキル威力:', {
     skillPowerFromLevel,
     skillPowerPercent,
@@ -71,8 +72,8 @@ export function calculateDamage(
   });
 
   // Step 3: 会心・属性倍率計算
-  const criticalMultiplier = 1.5 + (criticalDamageBonus / 100);
-  const advantageMultiplier = 1.25 + (advantageDamageBonus / 100);
+  const criticalMultiplier = GAME_CONSTANTS.DAMAGE_MULTIPLIERS.CRITICAL_BASE + (criticalDamageBonus / GAME_CONSTANTS.SKILL_POWER.PERCENT_DIVISOR);
+  const advantageMultiplier = GAME_CONSTANTS.DAMAGE_MULTIPLIERS.ADVANTAGE_BASE + (advantageDamageBonus / GAME_CONSTANTS.SKILL_POWER.PERCENT_DIVISOR);
   logger.debug('💥 倍率計算:', {
     criticalMultiplier: `1.5 + ${criticalDamageBonus}/100 = ${criticalMultiplier}`,
     advantageMultiplier: `1.25 + ${advantageDamageBonus}/100 = ${advantageMultiplier}`
@@ -133,7 +134,7 @@ export function calculateDamage(
  * スキル威力計算
  */
 export function getSkillPowerAtLevel(skill: Skill, level: number): number {
-  if (!skill || level < 1 || level > 15) return 0;
+  if (!skill || level < GAME_CONSTANTS.SKILL_LEVEL.MIN || level > GAME_CONSTANTS.SKILL_LEVEL.MAX) return 0;
 
   const powerPerLevel = skill.power_per_level;
   const skillPower = powerPerLevel[level - 1]; // 0-indexed
@@ -302,8 +303,8 @@ export function findOptimalSkillLevel(
   let maxDamage = 0;
   let optimalLevel = 1;
 
-  for (let level = 1; level <= 15; level++) {
-    const hitCount = skill.hit_count || 1;
+  for (let level = GAME_CONSTANTS.SKILL_LEVEL.MIN; level <= GAME_CONSTANTS.SKILL_LEVEL.MAX; level++) {
+    const hitCount = skill.hit_count || GAME_CONSTANTS.HIT_COUNT.DEFAULT;
     const totalAttack = calculateTotalAttack(baseAttack);
 
     const { results } = calculateDamage(
