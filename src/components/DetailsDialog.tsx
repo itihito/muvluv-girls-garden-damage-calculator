@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { cn } from '../lib/utils';
+import { formatNumber } from '../utils/formatters';
 import type { CalculationSteps, AdvancedSettings } from '../types';
 
 interface DetailsDialogProps {
@@ -44,10 +45,6 @@ export const DetailsDialog: React.FC<DetailsDialogProps> = React.memo(({
       .replace('基礎ダメージ × スキル威力(%) × 会心倍率 × 属性倍率 × ヒット数', t('details.calculation.formulas.advantageCriticalFormula'));
   };
 
-  // 数値フォーマット
-  const formatNumber = (value: number): string => {
-    return Math.floor(value).toLocaleString();
-  };
 
   // 計算ステップのレンダリング
   const renderCalculationStep = (

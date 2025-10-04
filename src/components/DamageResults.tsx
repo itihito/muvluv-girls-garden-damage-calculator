@@ -6,6 +6,7 @@ import { Badge } from './ui/badge';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Settings } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { formatNumber } from '../utils/formatters';
 import type { DamageResults as DamageResultsType, BarChartData } from '../types';
 
 interface DamageResultsProps {
@@ -22,11 +23,6 @@ export const DamageResults: React.FC<DamageResultsProps> = React.memo(({
   className = '',
 }) => {
   const { t } = useTranslation();
-
-  // 数値フォーマット
-  const formatNumber = (value: number): string => {
-    return Math.floor(value).toLocaleString();
-  };
 
   // カスタムツールチップ
   const CustomTooltip = ({ active, payload, label }: {
