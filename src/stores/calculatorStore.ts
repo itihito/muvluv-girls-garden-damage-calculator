@@ -18,8 +18,6 @@ const defaultBattleSettings: BattleSettings = {
 const defaultAdvancedSettings: AdvancedSettings = {
   baseCriticalRate: 5, // 5%
   roundingMode: 'floor',
-  showFormula: true,
-  animateResults: true,
 };
 
 
@@ -184,30 +182,39 @@ export const useCalculatorStore = create<CalculatorStore>()(
         return state.skillPower || 0;
       },
 
-      getBarChartData: () => {
+      getBarChartData: (labels?: { normal: string; critical: string; advantage: string; advantageCritical: string }) => {
         const state = get();
         const { results } = state;
 
         if (!results) return [];
 
+        const defaultLabels = {
+          normal: '通常',
+          critical: '会心',
+          advantage: '有利',
+          advantageCritical: '有利会心'
+        };
+
+        const effectiveLabels = labels || defaultLabels;
+
         const barChartData: BarChartData[] = [
           {
-            name: '通常',
+            name: effectiveLabels.normal,
             damage: results.finalDamages.normal,
             color: '#8884d8',
           },
           {
-            name: '会心',
+            name: effectiveLabels.critical,
             damage: results.finalDamages.critical,
             color: '#82ca9d',
           },
           {
-            name: '有利',
+            name: effectiveLabels.advantage,
             damage: results.finalDamages.advantageNormal,
             color: '#ffc658',
           },
           {
-            name: '有利会心',
+            name: effectiveLabels.advantageCritical,
             damage: results.finalDamages.advantageCritical,
             color: '#ff7300',
           },

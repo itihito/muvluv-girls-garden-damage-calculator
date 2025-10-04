@@ -103,7 +103,12 @@ function App() {
           <div className="lg:col-span-1">
             <DamageResults
               results={results}
-              barChartData={getBarChartData()}
+              barChartData={getBarChartData({
+                normal: t('damage.normal'),
+                critical: t('damage.critical'),
+                advantage: t('damage.advantage'),
+                advantageCritical: t('damage.advantageCritical')
+              })}
               onDetailsClick={() => setDetailsDialogOpen(true)}
             />
           </div>

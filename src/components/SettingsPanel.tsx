@@ -97,7 +97,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
               </Button>
             </div> */}
             <InputButton
-              label="スキル威力"
+              label={t('battle.skillPower')}
               value={skillPower || 100}
               min={0}
               max={10000}
@@ -110,7 +110,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
 
           {/* ヒット数設定 */}
           <InputButton
-            label="ヒット数"
+            label={t('battle.hitCount')}
             value={hitCount || 1}
             min={1}
             max={20}

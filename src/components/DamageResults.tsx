@@ -39,7 +39,7 @@ export const DamageResults: React.FC<DamageResultsProps> = ({
         <div className="bg-background border rounded-lg p-3 shadow-lg">
           <p className="font-medium">{label}</p>
           <p className="text-primary">
-            ダメージ: {formatNumber(payload[0].value)}
+            {t('damage.damageLabel')}: {formatNumber(payload[0].value)}
           </p>
         </div>
       );
@@ -143,14 +143,14 @@ export const DamageResults: React.FC<DamageResultsProps> = ({
 
           {/* 基礎情報 */}
           <div className="bg-muted/50 rounded-lg p-4 space-y-3">
-            <h4 className="font-medium text-sm">基礎計算情報</h4>
+            <h4 className="font-medium text-sm">{t('damage.baseInfo')}</h4>
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">{t('damage.totalAttack')}:</span>
                 <span className="font-medium">{formatNumber(results.totalAttack)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">敵防御力:</span>
+                <span className="text-muted-foreground">{t('battle.enemyDefense')}:</span>
                 <span className="font-medium">{formatNumber(results.enemyDefense)}</span>
               </div>
               <div className="flex justify-between">
@@ -158,8 +158,12 @@ export const DamageResults: React.FC<DamageResultsProps> = ({
                 <span className="font-medium">{formatNumber(results.baseDamage)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">会心倍率:</span>
+                <span className="text-muted-foreground">{t('damage.criticalMultiplier')}:</span>
                 <span className="font-medium">{results.criticalMultiplier.toFixed(2)}x</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">{t('damage.advantageMultiplier')}:</span>
+                <span className="font-medium">{results.advantageMultiplier.toFixed(2)}x</span>
               </div>
             </div>
           </div>
@@ -167,13 +171,13 @@ export const DamageResults: React.FC<DamageResultsProps> = ({
           {/* 倍率情報 */}
           <div className="flex flex-wrap gap-2">
             <Badge variant="secondary" className="bg-orange-100 text-orange-700">
-              会心: {results.criticalMultiplier.toFixed(2)}x
+              {t('damage.critical')}: {results.criticalMultiplier.toFixed(2)}x
             </Badge>
             <Badge variant="secondary" className="bg-green-100 text-green-700">
-              有利: {results.advantageMultiplier.toFixed(2)}x
+              {t('damage.advantage')}: {results.advantageMultiplier.toFixed(2)}x
             </Badge>
             <Badge variant="secondary" className="bg-red-100 text-red-700">
-              有利会心: {(results.criticalMultiplier * results.advantageMultiplier).toFixed(2)}x
+              {t('damage.advantageCritical')}: {(results.criticalMultiplier * results.advantageMultiplier).toFixed(2)}x
             </Badge>
           </div>
         </CardContent>
