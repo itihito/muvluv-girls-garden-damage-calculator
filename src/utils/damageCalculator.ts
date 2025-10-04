@@ -1,5 +1,6 @@
 import { logger } from "./logger";
 import { GAME_CONSTANTS } from '../constants/gameConstants';
+import { validateInput } from './errors';
 import type {
   DamageResults,
   CalculationSteps,
@@ -34,6 +35,24 @@ export function calculateDamage(
   advancedSettings?: AdvancedSettings,
   manualSkillPower?: number | null
 ): { results: DamageResults; steps: CalculationSteps } {
+  // 入力値検証
+  try {
+    validateInput.isValidNumber(totalAttack, 'totalAttack');
+    validateInput.isPositive(totalAttack, 'totalAttack');
+    validateInput.isInRange(totalAttack, GAME_CONSTANTS.ATTACK_POWER.MIN, GAME_CONSTANTS.ATTACK_POWER.MAX, 'totalAttack');
+
+    validateInput.isValidNumber(hitCount, 'hitCount');
+    validateInput.isInRange(hitCount, GAME_CONSTANTS.HIT_COUNT.MIN, GAME_CONSTANTS.HIT_COUNT.MAX, 'hitCount');
+
+    if (manualSkillPower !== null && manualSkillPower !== undefined) {
+      validateInput.isValidNumber(manualSkillPower, 'manualSkillPower');
+      validateInput.isInRange(manualSkillPower, GAME_CONSTANTS.SKILL_POWER.MIN, GAME_CONSTANTS.SKILL_POWER.MAX, 'manualSkillPower');
+    }
+  } catch (error) {
+    logger.error('入力値検証エラー:', error);
+    throw error;
+  }
+
   const { enemyDefense, criticalDamageBonus, advantageDamageBonus } = battleSettings;
   const roundingMode = advancedSettings?.roundingMode || 'floor';
 
