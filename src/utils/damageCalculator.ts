@@ -1,3 +1,4 @@
+import { logger } from "./logger";
 import type {
   DamageResults,
   CalculationSteps,
@@ -35,8 +36,8 @@ export function calculateDamage(
   const { enemyDefense, criticalDamageBonus, advantageDamageBonus } = battleSettings;
   const roundingMode = advancedSettings?.roundingMode || 'floor';
 
-  console.log('🔍 ダメージ計算開始');
-  console.log('📊 入力値:', {
+  logger.debug('🔍 ダメージ計算開始');
+  logger.debug('📊 入力値:', {
     totalAttack,
     enemyDefense,
     criticalDamageBonus,
@@ -49,20 +50,20 @@ export function calculateDamage(
   // Step 1: 基礎ダメージ計算 (総攻撃力 - 防御力)
   const baseDamageRaw = totalAttack - enemyDefense;
   const baseDamage = Math.max(0, baseDamageRaw); // 負数は0に
-  console.log('🔢 基礎ダメージ:', { baseDamageRaw, baseDamage });
+  logger.debug('🔢 基礎ダメージ:', { baseDamageRaw, baseDamage });
 
   // Step 2: スキル威力取得（手動入力を優先）
   let skillPowerFromLevel: number;
   if (manualSkillPower !== null && manualSkillPower !== undefined) {
     skillPowerFromLevel = manualSkillPower;
-    console.log('✋ 手動スキル威力使用:', manualSkillPower);
+    logger.debug('✋ 手動スキル威力使用:', manualSkillPower);
   } else {
     skillPowerFromLevel = skill ? getSkillPowerAtLevel(skill, skillLevel) : 100;
-    console.log('📊 レベルからスキル威力取得:', skillPowerFromLevel);
+    logger.debug('📊 レベルからスキル威力取得:', skillPowerFromLevel);
   }
 
   const skillPowerPercent = skillPowerFromLevel / 100;
-  console.log('⚡ スキル威力:', {
+  logger.debug('⚡ スキル威力:', {
     skillPowerFromLevel,
     skillPowerPercent,
     calculation: `${skillPowerFromLevel} / 100 = ${skillPowerPercent}`,
@@ -72,7 +73,7 @@ export function calculateDamage(
   // Step 3: 会心・属性倍率計算
   const criticalMultiplier = 1.5 + (criticalDamageBonus / 100);
   const advantageMultiplier = 1.25 + (advantageDamageBonus / 100);
-  console.log('💥 倍率計算:', {
+  logger.debug('💥 倍率計算:', {
     criticalMultiplier: `1.5 + ${criticalDamageBonus}/100 = ${criticalMultiplier}`,
     advantageMultiplier: `1.25 + ${advantageDamageBonus}/100 = ${advantageMultiplier}`
   });
@@ -86,11 +87,11 @@ export function calculateDamage(
   const advantageNormalCalc = baseDamage * skillPowerPercent * advantageMultiplier * hitCount;
   const advantageCriticalCalc = baseDamage * skillPowerPercent * criticalMultiplier * advantageMultiplier * hitCount;
 
-  console.log('🎯 ダメージ計算詳細:');
-  console.log('通常:', `${baseDamage} × ${skillPowerPercent} × ${hitCount} = ${normalCalc}`);
-  console.log('会心:', `${baseDamage} × ${skillPowerPercent} × ${criticalMultiplier} × ${hitCount} = ${criticalCalc}`);
-  console.log('有利:', `${baseDamage} × ${skillPowerPercent} × ${advantageMultiplier} × ${hitCount} = ${advantageNormalCalc}`);
-  console.log('有利会心:', `${baseDamage} × ${skillPowerPercent} × ${criticalMultiplier} × ${advantageMultiplier} × ${hitCount} = ${advantageCriticalCalc}`);
+  logger.debug('🎯 ダメージ計算詳細:');
+  logger.debug('通常:', `${baseDamage} × ${skillPowerPercent} × ${hitCount} = ${normalCalc}`);
+  logger.debug('会心:', `${baseDamage} × ${skillPowerPercent} × ${criticalMultiplier} × ${hitCount} = ${criticalCalc}`);
+  logger.debug('有利:', `${baseDamage} × ${skillPowerPercent} × ${advantageMultiplier} × ${hitCount} = ${advantageNormalCalc}`);
+  logger.debug('有利会心:', `${baseDamage} × ${skillPowerPercent} × ${criticalMultiplier} × ${advantageMultiplier} × ${hitCount} = ${advantageCriticalCalc}`);
 
   const finalDamages = {
     normal: applyRounding(normalCalc, roundingMode),
@@ -99,7 +100,7 @@ export function calculateDamage(
     advantageCritical: applyRounding(advantageCriticalCalc, roundingMode),
   };
 
-  console.log('✅ 端数処理後の最終結果:', finalDamages);
+  logger.debug('✅ 端数処理後の最終結果:', finalDamages);
 
   // 結果構築
   const results: DamageResults = {

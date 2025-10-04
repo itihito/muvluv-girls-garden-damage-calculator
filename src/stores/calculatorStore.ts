@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { debounce } from 'lodash-es';
 import { calculateDamage, getSkillPowerAtLevel } from '../utils/damageCalculator';
 import type {
   CalculatorStore,
@@ -20,214 +21,222 @@ const defaultAdvancedSettings: AdvancedSettings = {
   roundingMode: 'floor',
 };
 
-
 // Zustand ストア作成
 export const useCalculatorStore = create<CalculatorStore>()(
   devtools(
-    (set, get) => ({
-      // === 初期状態 ===
-      selectedCharacter: null,
-      selectedSkill: null,
-      skillLevel: 1,
-      selectedAttributeFilter: 'all',
+    (set, get) => {
+      // debouncedCalculate関数を作成（100ms待機）
+      const debouncedCalculate = debounce(() => {
+        get().calculateDamage();
+      }, 100);
 
-      manualAttackPower: null,
-      skillPower: null, // 現在の威力値（スキル選択時に自動設定、手動編集可能）
-      hitCount: null,   // ヒット数（スキル選択時に自動設定、手動編集可能）
-      isManualAttackMode: false,
+      return {
+        // === 初期状態 ===
+        selectedCharacter: null,
+        selectedSkill: null,
+        skillLevel: 1,
+        selectedAttributeFilter: 'all',
 
-      battleSettings: defaultBattleSettings,
-      advancedSettings: defaultAdvancedSettings,
+        manualAttackPower: null,
+        skillPower: null, // 現在の威力値（スキル選択時に自動設定、手動編集可能）
+        hitCount: null,   // ヒット数（スキル選択時に自動設定、手動編集可能）
+        isManualAttackMode: false,
 
-      results: null,
-      calculationSteps: null,
-      isDetailsDialogOpen: false,
+        battleSettings: defaultBattleSettings,
+        advancedSettings: defaultAdvancedSettings,
 
-      // === 選択アクション ===
-      setCharacter: (character) => {
-        set({
-          selectedCharacter: character,
-          selectedSkill: null, // キャラクター変更時はスキルリセット
-          skillLevel: 1,
-        });
-        // 自動計算実行
-        setTimeout(() => get().calculateDamage(), 0);
-      },
+        results: null,
+        calculationSteps: null,
+        isDetailsDialogOpen: false,
 
-      setSkill: (skill) => {
-        const newSkillPower = skill ? getSkillPowerAtLevel(skill, get().skillLevel) : null;
-        const newHitCount = skill?.hit_count || null;
-        set({
-          selectedSkill: skill,
-          skillPower: newSkillPower,
-          hitCount: newHitCount
-        });
-        setTimeout(() => get().calculateDamage(), 0);
-      },
+        // === 選択アクション ===
+        setCharacter: (character) => {
+          set({
+            selectedCharacter: character,
+            selectedSkill: null, // キャラクター変更時はスキルリセット
+            skillLevel: 1,
+          });
+          // 即座に計算実行（選択時は遅延不要）
+          get().calculateDamage();
+        },
 
-      setSkillLevel: (level) => {
-        const state = get();
-        const newLevel = Math.max(1, Math.min(15, level));
-        const newSkillPower = state.selectedSkill ? getSkillPowerAtLevel(state.selectedSkill, newLevel) : null;
-        set({
-          skillLevel: newLevel,
-          skillPower: newSkillPower
-        });
-        setTimeout(() => get().calculateDamage(), 0);
-      },
+        setSkill: (skill) => {
+          const newSkillPower = skill ? getSkillPowerAtLevel(skill, get().skillLevel) : null;
+          const newHitCount = skill?.hit_count || null;
+          set({
+            selectedSkill: skill,
+            skillPower: newSkillPower,
+            hitCount: newHitCount
+          });
+          // 即座に計算実行（選択時は遅延不要）
+          get().calculateDamage();
+        },
 
-      setAttributeFilter: (filter) => {
-        set({ selectedAttributeFilter: filter });
-      },
+        setSkillLevel: (level) => {
+          const state = get();
+          const newLevel = Math.max(1, Math.min(15, level));
+          const newSkillPower = state.selectedSkill ? getSkillPowerAtLevel(state.selectedSkill, newLevel) : null;
+          set({
+            skillLevel: newLevel,
+            skillPower: newSkillPower
+          });
+          // 即座に計算実行（選択時は遅延不要）
+          get().calculateDamage();
+        },
 
-      // === 手動入力アクション ===
-      setManualAttackPower: (power) => {
-        set({ manualAttackPower: power });
-        setTimeout(() => get().calculateDamage(), 0);
-      },
+        setAttributeFilter: (filter) => {
+          set({ selectedAttributeFilter: filter });
+        },
 
-      setSkillPower: (power) => {
-        set({ skillPower: power });
-        setTimeout(() => get().calculateDamage(), 0);
-      },
+        // === 手動入力アクション（debounce適用） ===
+        setManualAttackPower: (power) => {
+          set({ manualAttackPower: power });
+          debouncedCalculate();
+        },
 
-      setHitCount: (count) => {
-        set({ hitCount: count });
-        setTimeout(() => get().calculateDamage(), 0);
-      },
+        setSkillPower: (power) => {
+          set({ skillPower: power });
+          debouncedCalculate();
+        },
 
-      toggleManualAttackMode: (enabled) => {
-        set({ isManualAttackMode: enabled });
-        if (!enabled) {
-          set({ manualAttackPower: null });
-        }
-        setTimeout(() => get().calculateDamage(), 0);
-      },
+        setHitCount: (count) => {
+          set({ hitCount: count });
+          debouncedCalculate();
+        },
 
-      // === 設定アクション ===
-      updateBattleSettings: (settings) => {
-        set((state) => ({
-          battleSettings: { ...state.battleSettings, ...settings },
-        }));
-        setTimeout(() => get().calculateDamage(), 0);
-      },
+        toggleManualAttackMode: (enabled) => {
+          set({ isManualAttackMode: enabled });
+          if (!enabled) {
+            set({ manualAttackPower: null });
+          }
+          get().calculateDamage();
+        },
 
-      updateAdvancedSettings: (settings) => {
-        set((state) => ({
-          advancedSettings: { ...state.advancedSettings, ...settings },
-        }));
-        setTimeout(() => get().calculateDamage(), 0);
-      },
+        // === 設定アクション（debounce適用） ===
+        updateBattleSettings: (settings) => {
+          set((state) => ({
+            battleSettings: { ...state.battleSettings, ...settings },
+          }));
+          debouncedCalculate();
+        },
 
-      // === UI アクション ===
-      setDetailsDialogOpen: (open) => {
-        set({ isDetailsDialogOpen: open });
-      },
+        updateAdvancedSettings: (settings) => {
+          set((state) => ({
+            advancedSettings: { ...state.advancedSettings, ...settings },
+          }));
+          debouncedCalculate();
+        },
 
-      // === 計算アクション ===
-      calculateDamage: () => {
-        const state = get();
-        const { skillPower, hitCount } = state;
+        // === UI アクション ===
+        setDetailsDialogOpen: (open) => {
+          set({ isDetailsDialogOpen: open });
+        },
 
-        // スキル威力とヒット数のデフォルト値を設定
-        const effectiveSkillPower = skillPower || 100;
-        const effectiveHitCount = hitCount || 1;
+        // === 計算アクション ===
+        calculateDamage: () => {
+          const state = get();
+          const { skillPower, hitCount } = state;
 
-        // 攻撃力計算
-        const totalAttack = state.getEffectiveAttackPower();
+          // スキル威力とヒット数のデフォルト値を設定
+          const effectiveSkillPower = skillPower || 100;
+          const effectiveHitCount = hitCount || 1;
 
-        // ダメージ計算実行
-        const { results, steps } = calculateDamage(
-          totalAttack,
-          state.battleSettings,
-          null, // スキルオブジェクトは不要
-          1,    // スキルレベルは不要
-          effectiveHitCount,
-          state.advancedSettings,
-          effectiveSkillPower
-        );
+          // 攻撃力計算
+          const totalAttack = state.getEffectiveAttackPower();
 
-        set({ results, calculationSteps: steps });
-      },
+          // ダメージ計算実行
+          const { results, steps } = calculateDamage(
+            totalAttack,
+            state.battleSettings,
+            null, // スキルオブジェクトは不要
+            1,    // スキルレベルは不要
+            effectiveHitCount,
+            state.advancedSettings,
+            effectiveSkillPower
+          );
 
-      reset: () => {
-        set({
-          selectedCharacter: null,
-          selectedSkill: null,
-          skillLevel: 1,
-          selectedAttributeFilter: 'all',
-          manualAttackPower: null,
-          skillPower: null,
-          hitCount: null,
-          isManualAttackMode: false,
-          battleSettings: defaultBattleSettings,
-          advancedSettings: defaultAdvancedSettings,
-          results: null,
-          calculationSteps: null,
-          isDetailsDialogOpen: false,
-        });
-      },
+          set({ results, calculationSteps: steps });
+        },
 
-      // === ヘルパー関数 ===
-      getEffectiveAttackPower: () => {
-        const state = get();
-        const { manualAttackPower } = state;
+        reset: () => {
+          set({
+            selectedCharacter: null,
+            selectedSkill: null,
+            skillLevel: 1,
+            selectedAttributeFilter: 'all',
+            manualAttackPower: null,
+            skillPower: null,
+            hitCount: null,
+            isManualAttackMode: false,
+            battleSettings: defaultBattleSettings,
+            advancedSettings: defaultAdvancedSettings,
+            results: null,
+            calculationSteps: null,
+            isDetailsDialogOpen: false,
+          });
+        },
 
-        // 手動入力がある場合はそれを使用、なければデフォルト値
-        return manualAttackPower !== null ? manualAttackPower : 1000;
-      },
+        // === ヘルパー関数 ===
+        getEffectiveAttackPower: () => {
+          const state = get();
+          const { manualAttackPower } = state;
 
-      getCurrentSkillPower: () => {
-        const state = get();
-        return state.skillPower || 0;
-      },
+          // 手動入力がある場合はそれを使用、なければデフォルト値
+          return manualAttackPower !== null ? manualAttackPower : 1000;
+        },
 
-      getBarChartData: (labels?: { normal: string; critical: string; advantage: string; advantageCritical: string }) => {
-        const state = get();
-        const { results } = state;
+        getCurrentSkillPower: () => {
+          const state = get();
+          return state.skillPower || 0;
+        },
 
-        if (!results) return [];
+        getBarChartData: (labels?: { normal: string; critical: string; advantage: string; advantageCritical: string }) => {
+          const state = get();
+          const { results } = state;
 
-        const defaultLabels = {
-          normal: '通常',
-          critical: '会心',
-          advantage: '有利',
-          advantageCritical: '有利会心'
-        };
+          if (!results) return [];
 
-        const effectiveLabels = labels || defaultLabels;
+          const defaultLabels = {
+            normal: '通常',
+            critical: '会心',
+            advantage: '有利',
+            advantageCritical: '有利会心'
+          };
 
-        const barChartData: BarChartData[] = [
-          {
-            name: effectiveLabels.normal,
-            damage: results.finalDamages.normal,
-            color: '#8884d8',
-          },
-          {
-            name: effectiveLabels.critical,
-            damage: results.finalDamages.critical,
-            color: '#82ca9d',
-          },
-          {
-            name: effectiveLabels.advantage,
-            damage: results.finalDamages.advantageNormal,
-            color: '#ffc658',
-          },
-          {
-            name: effectiveLabels.advantageCritical,
-            damage: results.finalDamages.advantageCritical,
-            color: '#ff7300',
-          },
-        ];
+          const effectiveLabels = labels || defaultLabels;
 
-        return barChartData;
-      },
+          const barChartData: BarChartData[] = [
+            {
+              name: effectiveLabels.normal,
+              damage: results.finalDamages.normal,
+              color: '#8884d8',
+            },
+            {
+              name: effectiveLabels.critical,
+              damage: results.finalDamages.critical,
+              color: '#82ca9d',
+            },
+            {
+              name: effectiveLabels.advantage,
+              damage: results.finalDamages.advantageNormal,
+              color: '#ffc658',
+            },
+            {
+              name: effectiveLabels.advantageCritical,
+              damage: results.finalDamages.advantageCritical,
+              color: '#ff7300',
+            },
+          ];
 
-      // 初期化時に一度計算を実行
-      init: () => {
-        setTimeout(() => get().calculateDamage(), 0);
-      },
-    }),
+          return barChartData;
+        },
+
+        // 初期化時に一度計算を実行
+        init: () => {
+          get().calculateDamage();
+        },
+      };
+    },
     {
       name: 'calculator-store', // Redux DevTools での名前
     }

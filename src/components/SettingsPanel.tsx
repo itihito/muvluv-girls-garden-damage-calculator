@@ -19,7 +19,7 @@ interface SettingsPanelProps {
   className?: string;
 }
 
-export const SettingsPanel: React.FC<SettingsPanelProps> = ({
+export const SettingsPanel: React.FC<SettingsPanelProps> = React.memo(({
   battleSettings,
   onBattleSettingsChange,
   manualAttackPower,
@@ -155,6 +155,6 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
       />
     </div>
   );
-};
+});
 
 export default SettingsPanel;

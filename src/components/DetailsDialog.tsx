@@ -21,7 +21,7 @@ interface DetailsDialogProps {
   className?: string;
 }
 
-export const DetailsDialog: React.FC<DetailsDialogProps> = ({
+export const DetailsDialog: React.FC<DetailsDialogProps> = React.memo(({
   isOpen,
   onClose,
   calculationSteps,
@@ -238,6 +238,6 @@ export const DetailsDialog: React.FC<DetailsDialogProps> = ({
       </DialogContent>
     </Dialog>
   );
-};
+});
 
 export default DetailsDialog;

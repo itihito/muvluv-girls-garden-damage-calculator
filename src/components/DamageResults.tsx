@@ -15,7 +15,7 @@ interface DamageResultsProps {
   className?: string;
 }
 
-export const DamageResults: React.FC<DamageResultsProps> = ({
+export const DamageResults: React.FC<DamageResultsProps> = React.memo(({
   results,
   barChartData,
   onDetailsClick,
@@ -184,6 +184,6 @@ export const DamageResults: React.FC<DamageResultsProps> = ({
       </Card>
     </div>
   );
-};
+});
 
 export default DamageResults;
