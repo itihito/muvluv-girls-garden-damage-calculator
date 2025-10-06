@@ -1,99 +1,43 @@
 # マブラヴ ガールズガーデン ダメージ計算機
 
-ゲームのダメージ計算を行うWebアプリケーションです。
+「マブラヴ ガールズガーデン」のダメージ計算を行うシンプルなWebアプリケーションです。
 
-## 🚀 デプロイ
+## 🎮 アプリについて
 
-本プロジェクトはGitHub Pagesにデプロイされています。
+このアプリは、ゲーム「マブラヴ ガールズガーデン」のダメージ計算を手動入力で行うツールです。攻撃力、スキル威力、ヒット数などのパラメータを入力することで、4パターンのダメージ値を自動計算します。
 
-- **本番URL**: https://itihito.github.io/muvluv-girls-garden-damage-calculator/
+### 主な機能
 
-### 自動デプロイ
+#### ステータス手動入力
+- 攻撃力の設定
+- スキル威力の設定（%）
+- ヒット数の設定
+- 敵防御力の設定
+- 会心ダメージ強化率（ギアカスタム反映）
+- 有利属性ダメージ強化率（ギアカスタム反映）
 
-`prd`ブランチへのpush時に、GitHub Actionsが自動的にビルド＆デプロイを実行します。
+#### ダメージ計算結果
+以下の4パターンのダメージを同時表示：
+- **通常ダメージ**: 基礎ダメージ
+- **会心ダメージ**: 基礎ダメージ × (1.5 + 会心強化%)
+- **有利通常ダメージ**: 基礎ダメージ × (1.25 + 属性強化%)
+- **有利会心ダメージ**: 基礎ダメージ × 会心倍率 × 属性倍率
 
-```bash
-# prdブランチにプッシュ
-git push origin prd
+#### 詳細機能
+- 計算過程の詳細表示（5ステップの計算内訳）
+- 高度な設定（端数処理モード：切り捨て/切り上げ/四捨五入）
+- 棒グラフによる視覚的な比較
+- 多言語対応（日本語、英語、中国語）
+
+### ダメージ計算式
+
+**基本計算式**（アルテリオス計算式ベース）
 ```
+基礎ダメージ = (攻撃力 - 敵防御力) × スキル威力(%) × ヒット数
 
-デプロイ状況は [Actions](https://github.com/itihito/muvluv-girls-garden-damage-calculator/actions) タブで確認できます。
-
-### 初回セットアップ
-
-GitHub Pagesを有効化するには、リポジトリ設定で以下を実施してください：
-
-1. リポジトリの **Settings** > **Pages** に移動
-2. **Source** を **GitHub Actions** に設定
-
-## 🛠️ 開発
-
-### 必要環境
-
-- Node.js 20.x 以上
-- npm
-
-### ローカル開発
-
-```bash
-# 依存関係のインストール
-npm install
-
-# 開発サーバー起動
-npm run dev
-
-# 型チェック
-npm run typecheck
-
-# リント
-npm run lint
-npm run lint:fix
-
-# ビルド
-npm run build
-
-# ビルド結果をプレビュー
-npm run preview
+最終ダメージ:
+- 通常: 基礎ダメージ
+- 会心: 基礎ダメージ × (1.5 + 会心強化%)
+- 有利通常: 基礎ダメージ × (1.25 + 属性強化%)
+- 有利会心: 基礎ダメージ × (1.5 + 会心強化%) × (1.25 + 属性強化%)
 ```
-
-### デプロイプレビュー
-
-本番環境と同じbase pathでローカルプレビューする場合：
-
-```bash
-npm run deploy:preview
-```
-
-## 📦 技術スタック
-
-- **フレームワーク**: React 19.1.1
-- **言語**: TypeScript 5.8.3
-- **ビルドツール**: Vite 7.1.7
-- **状態管理**: Zustand 5.0.8
-- **国際化**: i18next 25.5.2, react-i18next 16.0.0
-- **UIライブラリ**: shadcn/ui (Radix UI)
-- **スタイリング**: Tailwind CSS 4.1.13
-- **チャート**: Recharts 3.2.1
-
-## 📁 プロジェクト構造
-
-詳細は [DIRECTORY_STRUCTURE.md](./DIRECTORY_STRUCTURE.md) を参照してください。
-
-## 📝 開発ドキュメント
-
-- [PLAN.md](./PLAN.md) - プロジェクト仕様書
-- [DIRECTORY_STRUCTURE.md](./DIRECTORY_STRUCTURE.md) - ディレクトリ構造ドキュメント
-- [docs/IMPLEMENTATION_PLAN.md](./docs/IMPLEMENTATION_PLAN.md) - 詳細実装計画書
-- [CLAUDE.md](./CLAUDE.md) - Claude Code用プロジェクト説明
-
-## 🤝 コントリビューション
-
-1. このリポジトリをフォーク
-2. フィーチャーブランチを作成 (`git checkout -b feature/amazing-feature`)
-3. 変更をコミット (`git commit -m 'Add some amazing feature'`)
-4. ブランチにプッシュ (`git push origin feature/amazing-feature`)
-5. プルリクエストを作成
-
-## 📄 ライセンス
-
-このプロジェクトはMITライセンスの下で公開されています。
